@@ -1,18 +1,7 @@
-<picture><source media="(prefers-color-scheme: dark)" srcset="assets/hero-dark.svg"><img alt="Chaoqi Luo (罗朝旗). Building LLM agents at Z.AI. Speeding up video generation at Penn." src="assets/hero-light.svg" width="100%"></picture>
+<a href="https://chaoqiluo.com/"><img alt="Building LLM agents at Z.AI. Making video generation faster at Penn." src="assets/opener.svg" width="100%"></a>
 
-I'm an M.S. student in Electrical Engineering (AI track) at the University of Pennsylvania. At [Zhipu AI (Z.AI)](https://www.zhipuai.cn/en/about) I'm a research engineer intern, building the runtime, tools, and context management behind LLM agents. At Penn I'm a research intern in [Jiatao Gu](https://jiataogu.me/)'s group, where we speed up autoregressive video generation with few-step flow distillation.
+<a href="https://github.com/Chaoqi31/argus-truth-engine"><img alt="Argus. Audits AI-generated content, claim by claim. Best Technical Implementation, UCWS Singapore 2026." src="assets/work-argus.svg" width="50%"></a><a href="https://github.com/Chaoqi31/nemotron-reasoning-lora"><img alt="Nemotron Reasoning. Single-epoch LoRA on Nemotron-3-Nano-30B-A3B. Kaggle silver medal, 33rd of 4,182." src="assets/work-nemotron.svg" width="50%"></a><br><a href="https://github.com/Chaoqi31/text2sql-agent-rl"><img alt="text2sql-agent-rl. An RL-trained agent that explores the database first. +7.2 execution accuracy on BIRD dev." src="assets/work-text2sql.svg" width="50%"></a><a href="https://github.com/Chaoqi31/saiddone"><img alt="SaidDone. Local-first voice dictation for macOS. Free, private, offline by default." src="assets/work-saiddone.svg" width="50%"></a>
 
-More on [my website](https://chaoqiluo.com/), [Google Scholar](https://scholar.google.com/citations?user=eOwS19sAAAAJ&hl=en), and [LinkedIn](https://www.linkedin.com/in/chaoqi-luo-4317bb2b7/), or email [luo31@seas.upenn.edu](mailto:luo31@seas.upenn.edu).
+<a href="https://github.com/walkinglabs/hands-on-modern-rl/pull/37"><img alt="Merged upstream: walkinglabs/hands-on-modern-rl #37 Update rLLM-FinQA reproduction commands" src="assets/merged.svg" width="100%"></a>
 
-### Open-source contributions
-
-<!-- contributions:start -->
-<a href="https://github.com/walkinglabs/hands-on-modern-rl/pull/37"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/contrib/walkinglabs-hands-on-modern-rl-dark.svg"><img alt="walkinglabs/hands-on-modern-rl: merged PR #37, Update rLLM-FinQA reproduction commands" src="assets/contrib/walkinglabs-hands-on-modern-rl-light.svg" width="416"></picture></a>
-<!-- contributions:end -->
-
-### Selected work
-
-- **[Argus](https://argus-truth-engine.vercel.app)** is an audit layer for AI-generated content. It checks each claim with deep research and links every verdict to its reasoning trail. Best Technical Implementation at the UCWS Singapore 2026 × MiroMind Deep Research hackathon. ([code](https://github.com/Chaoqi31/argus-truth-engine))
-- **[NVIDIA Nemotron Model Reasoning Challenge](https://www.kaggle.com/competitions/nvidia-nemotron-model-reasoning-challenge)**. Kaggle silver medal, 33rd of 4,182, with a single-epoch LoRA fine-tune of Nemotron-3-Nano-30B-A3B. ([code](https://github.com/Chaoqi31/nemotron-reasoning-lora))
-- **[text2sql-agent-rl](https://github.com/Chaoqi31/text2sql-agent-rl)** trains Qwen3.5-9B with GRPO to explore a database with tools before it answers. RL adds 7.2 points of execution accuracy on BIRD dev.
-- **[SaidDone](https://github.com/Chaoqi31/saiddone)** is free, local-first voice dictation for macOS. Press a hotkey, speak, and polished text appears at your cursor.
+<p align="center"><a href="https://chaoqiluo.com/"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/link-website-dark.svg"><img alt="Website" src="assets/link-website-light.svg"></picture></a> <a href="https://scholar.google.com/citations?user=eOwS19sAAAAJ&hl=en"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/link-scholar-dark.svg"><img alt="Google Scholar" src="assets/link-scholar-light.svg"></picture></a> <a href="https://www.linkedin.com/in/chaoqi-luo-4317bb2b7/"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/link-linkedin-dark.svg"><img alt="LinkedIn" src="assets/link-linkedin-light.svg"></picture></a> <a href="mailto:luo31@seas.upenn.edu"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/link-email-dark.svg"><img alt="Email" src="assets/link-email-light.svg"></picture></a></p>
