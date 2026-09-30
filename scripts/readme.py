@@ -5,6 +5,7 @@ Each picture is a carved black block: lines are cut away to show the paper, and 
 Every word is converted to glyph outlines, so the SVGs need no fonts at view time.
 Fonts come from the Google Fonts subsetting API and are cached in .cache/fonts.
 Merged pull requests come from GitHub search, so a rerun picks up new ones.
+The starwave tile is drawn from the waves starwave published that day, so a rerun redraws it.
 Needs: pip install fonttools uharfbuzz numpy, and an authenticated gh CLI.
 """
 import hashlib
@@ -41,6 +42,11 @@ PROJECTS = [
     dict(slug="saiddone", name="SaidDone", href="https://github.com/Chaoqi31/saiddone",
          blurb="Local-first voice dictation for macOS.", note="Free, private, offline by default"),
 ]
+# One project gets a full-width tile; its picture is drawn from the data it publishes each day.
+FEATURE = dict(slug="starwave", name="starwave", href="https://github.com/Chaoqi31/starwave",
+               blurb="GitHub Trending shows the repos that are already famous. starwave shows the waves forming right now.",
+               note="Updated daily, zero dependencies")
+STARWAVE_DATA = "https://chaoqi31.github.io/starwave/latest.json"
 LINKS = [
     ("website", "Website", "https://chaoqiluo.com/"),
     ("scholar", "Google Scholar", "https://scholar.google.com/citations?user=eOwS19sAAAAJ&hl=en"),
@@ -205,6 +211,25 @@ def catmull(points, closed=False):
     return d + ("Z" if closed else "")
 
 
+def sample(points, per=8):
+    """Points along the open curve catmull() draws through `points`."""
+    p = np.array(points, float)
+    p = np.vstack([p[0], p, p[-1]])
+    t = np.linspace(0, 1, per, endpoint=False)[:, None]
+    out = []
+    for i in range(1, len(p) - 2):
+        c1, c2 = p[i] + (p[i + 1] - p[i - 1]) / 6, p[i + 1] - (p[i + 2] - p[i]) / 6
+        out += list((1 - t) ** 3 * p[i] + 3 * (1 - t) ** 2 * t * c1 + 3 * (1 - t) * t ** 2 * c2 + t ** 3 * p[i + 1])
+    return np.array(out + [p[-2]])
+
+
+def cut(points, widths):
+    """The outline of a gouge cut along `points`, as wide as `widths` at each point, so a cut can swell and taper."""
+    d = np.gradient(points, axis=0)
+    side = np.stack([-d[:, 1], d[:, 0]], 1) / np.hypot(d[:, 0], d[:, 1])[:, None] * (np.asarray(widths) / 2)[:, None]
+    return polyline(np.vstack([points + side, (points - side)[::-1]])) + "Z"
+
+
 def wobbly(points, amp, seed):
     p = np.array(points, float)
     n = len(p)
@@ -309,6 +334,43 @@ def voice(cx, cy):
 DRAW = {"argus": eye, "nemotron": medal, "text2sql": database, "saiddone": voice}
 
 
+def star(cx, cy, r, seed):
+    points = [(cx + (r if i % 2 == 0 else r * .43) * math.sin(i * math.pi / 5),
+               cy - (r if i % 2 == 0 else r * .43) * math.cos(i * math.pi / 5)) for i in range(10)]
+    return f'<path d="{polyline(wobbly(points, r * .06, seed))}Z" fill="{RED}"/>'
+
+
+def ridges(x0, x1, horizon, front, waves):
+    """A sea of carved swells, one per wave, each shaped by its stars per day over the last 14 days.
+
+    The wave starwave ranks first swells nearest, the rest recede toward the horizon.
+    A swell's height is the log of its best day, and it is filled black so it hides the swells behind it.
+    Its crest is cut wider where it stands higher and nested cuts follow it up, so a calm day stays one thin line.
+    A red star hangs over the first wave's best day.
+    """
+    xs = np.linspace(x0 + 70, x1 - 40, len(waves[0]["daily"]))
+    tallest = math.log1p(max(max(w["daily"]) for w in waves) or 1)
+    out, crests = "", []
+    for k in reversed(range(len(waves))):
+        daily, depth = waves[k]["daily"], k / max(1, len(waves) - 1)
+        peak, near = max(daily) or 1, 1 - .6 * depth
+        base = horizon + (front - horizon) * (1 - depth) ** 1.3
+        height = 110 * near * math.log1p(peak) / tallest
+        crest = [(x0, base), (x0 + 36, base)] + [(x, base - height * v / peak) for x, v in zip(xs, daily)] + [(x1, base)]
+        p = sample(wobbly(crest, .7, 80 + k))
+        rise = np.clip((base - p[:, 1]) / height, 0, 1)
+        ends = np.clip(30 * np.minimum(np.linspace(0, 1, len(p)), np.linspace(1, 0, len(p))), 0, 1)
+        hand = lambda j: np.clip(1 + .25 * noise(len(p), 70 + 10 * k + j, 24), .6, 1.4)  # noqa: E731
+        out += f'<path d="{polyline(p)}L{num(x1)} {num(base + 60)}L{num(x0)} {num(base + 60)}Z" fill="{BLACK}"/>'
+        cuts = cut(p, ends * hand(0) * (1 + 2.6 * near * rise ** .6))
+        for j in range(1, int(height / 22) + 1):
+            cuts += cut(p + [0, 6 * near * j], near * hand(j) * 1.9 * np.clip((rise - .15 * j) / .4, 0, 1) ** .8)
+        out += f'<path d="{cuts}" fill="{PAPER}"/>'
+        crests.append(p)
+    x = xs[int(np.argmax(waves[0]["daily"]))]
+    return out + star(x, min(np.interp(x, p[:, 0], p[:, 1]) for p in crests) - 20, 11, 90)
+
+
 def merges(x0, x1, y, prs, biggest, seed):
     """A trunk, and for each merged pull request a red branch that leaves it and comes back.
 
@@ -375,6 +437,19 @@ def tile(p, i):
     return svg(HALF, ph + vgap, f'{p["name"]}. {p["blurb"]} {p["note"]}.', body, clip + DEFS)
 
 
+def feature(p, waves):
+    """The full-width tile: the same block and caption as a tile, with the waves starwave found today as its picture."""
+    ph, bx, by, bw, bh = 324, 16, 16, W - 32, 190
+    body = paper(0, 0, W, ph) + block(bx, by, bw, bh)
+    body += (f'<g clip-path="url(#tile)" filter="url(#rough)">{gouges(bx, by, bx + bw, by + 90, 5, 44)}'
+             f'{ridges(bx + 8, bx + bw - 8, by + 88, by + bh - 18, waves)}</g>')
+    body += text(DISPLAY, p["name"], 27, 32, by + bh + 44, BLACK, -0.01)
+    body += text(TEXT, p["blurb"], 14.5, 32, by + bh + 70, BLACK)
+    body += text(ITALIC, p["note"], 14, 32, ph - 22, RED)
+    clip = f'<clipPath id="tile"><rect x="{bx}" y="{by}" width="{bw}" height="{bh}"/></clipPath>'
+    return svg(W, ph, f'{p["name"]}. {p["blurb"]} {p["note"]}.', body, clip + DEFS)
+
+
 def short(n):
     """Star counts the way GitHub abbreviates them: 950, 4.5k, 76.8k, 109k."""
     return str(n) if n < 1000 else f"{n / 1000:.1f}k" if n < 100000 else f"{n / 1000:.0f}k"
@@ -421,6 +496,13 @@ def fetch_merged():
     return sorted(rows, key=lambda row: (-len(row[1]), -row[2]))
 
 
+def fetch_waves():
+    """The waves starwave ranks today, busiest first, with clusters it flags as coordinated left out."""
+    with urllib.request.urlopen(STARWAVE_DATA) as r:
+        waves = json.load(r)["waves"]
+    return [w for w in waves if not w["flags"]][:6]
+
+
 def alt_merged(merged):
     total = sum(len(prs) for _, prs, _ in merged)
     return f"Merged upstream, {total} pull requests: " + "; ".join(f"{repo}, {len(prs)}" for repo, prs, _ in merged)
@@ -436,11 +518,13 @@ def themed(slug, href, alt):
 
 
 def readme(merged):
-    tiles = [image(f'work-{p["slug"]}.svg', p["href"], f'{p["name"]}. {p["blurb"]} {p["note"]}.', "50%") for p in PROJECTS]
+    alt = lambda p: f'{p["name"]}. {p["blurb"]} {p["note"]}.'  # noqa: E731
+    tiles = [image(f'work-{p["slug"]}.svg', p["href"], alt(p), "50%") for p in PROJECTS]
     blocks = [
         image("opener.svg", "https://chaoqiluo.com/", " ".join(HEADLINE)),
         # No whitespace between tiles: a space would push the second tile of each row onto its own line.
         tiles[0] + tiles[1] + "<br>" + tiles[2] + tiles[3],
+        image(f'work-{FEATURE["slug"]}.svg', FEATURE["href"], alt(FEATURE)),
         image("merged.svg", MERGED_HREF, alt_merged(merged)),
         '<p align="center">' + " ".join(themed(f"link-{slug}", href, label) for slug, label, href in LINKS) + "</p>",
     ]
@@ -448,11 +532,11 @@ def readme(merged):
 
 
 def main():
-    merged = fetch_merged()
+    merged, waves = fetch_merged(), fetch_waves()
     ASSETS.mkdir(exist_ok=True)
     for old in ASSETS.glob("*.svg"):
         old.unlink()
-    files = {"opener.svg": opener(), "merged.svg": score(merged)}
+    files = {"opener.svg": opener(), "merged.svg": score(merged), f'work-{FEATURE["slug"]}.svg': feature(FEATURE, waves)}
     files.update({f'work-{p["slug"]}.svg': tile(p, i) for i, p in enumerate(PROJECTS)})
     for slug, label, _ in LINKS:
         for theme, ink in LINK_INK.items():
