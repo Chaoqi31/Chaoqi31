@@ -30,7 +30,7 @@ CACHE = ROOT / ".cache/fonts"
 ASSETS = ROOT / "assets"
 USER = "Chaoqi31"
 
-HEADLINE = ["Building LLM agents at Z.AI.", "Making video generation faster at Penn."]
+HEADLINE = ["Research engineer intern at Z.AI.", "M.S. student at Penn."]
 PROJECTS = [
     dict(slug="argus", name="Argus", href="https://github.com/Chaoqi31/argus-truth-engine",
          blurb="Audits AI-generated content, claim by claim.", note="Best Technical Implementation, UCWS Singapore 2026"),

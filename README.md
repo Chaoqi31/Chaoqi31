@@ -1,4 +1,4 @@
-<a href="https://chaoqiluo.com/"><img alt="Building LLM agents at Z.AI. Making video generation faster at Penn." src="assets/opener.svg" width="100%"></a>
+<a href="https://chaoqiluo.com/"><img alt="Research engineer intern at Z.AI. M.S. student at Penn." src="assets/opener.svg" width="100%"></a>
 
 <a href="https://github.com/Chaoqi31/argus-truth-engine"><img alt="Argus. Audits AI-generated content, claim by claim. Best Technical Implementation, UCWS Singapore 2026." src="assets/work-argus.svg" width="50%"></a><a href="https://github.com/Chaoqi31/nemotron-reasoning-lora"><img alt="Nemotron Reasoning. Single-epoch LoRA on Nemotron-3-Nano-30B-A3B. Kaggle silver medal, 33rd of 4,182." src="assets/work-nemotron.svg" width="50%"></a><br><a href="https://github.com/Chaoqi31/text2sql-agent-rl"><img alt="text2sql-agent-rl. An RL-trained agent that explores the database first. +7.2 execution accuracy on BIRD dev." src="assets/work-text2sql.svg" width="50%"></a><a href="https://github.com/Chaoqi31/saiddone"><img alt="SaidDone. Local-first voice dictation for macOS. Free, private, offline by default." src="assets/work-saiddone.svg" width="50%"></a>
 
